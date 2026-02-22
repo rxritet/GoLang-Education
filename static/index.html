@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Go REST API — Книги</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 8px;
+      color: #38bdf8;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 40px;
+      font-size: 0.9rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: #7dd3fc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .get    { background: #065f46; color: #6ee7b7; }
+    .post   { background: #1e3a5f; color: #93c5fd; }
+    .put    { background: #78350f; color: #fde68a; }
+    .delete { background: #7f1d1d; color: #fca5a5; }
+
+    input, textarea {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus { border-color: #38bdf8; }
+
+    textarea { resize: vertical; min-height: 90px; font-family: monospace; }
+
+    button {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: opacity 0.15s;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    .btn-get    { background: #065f46; color: #fff; }
+    .btn-post   { background: #2563eb; color: #fff; }
+    .btn-put    { background: #92400e; color: #fff; }
+    .btn-delete { background: #dc2626; color: #fff; }
+
+    .response {
+      margin-top: 14px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+      color: #a3e635;
+    }
+
+    .response.error { color: #f87171; }
+
+    .books-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.87rem;
+    }
+
+    .books-table th {
+      text-align: left;
+      padding: 8px 10px;
+      color: #7dd3fc;
+      border-bottom: 1px solid #334155;
+    }
+
+    .books-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .books-table tr:last-child td { border-bottom: none; }
+
+    .full-width { grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+  <h1>📚 Go REST API</h1>
+  <p class="subtitle">Простой CRUD — коллекция книг | <code>GET · POST · PUT · DELETE</code></p>
+
+  <div class="layout">
+
+    <!-- GET ALL -->
+    <div class="card">
+      <h2><span class="badge get">GET</span> Все книги</h2>
+      <button class="btn-get" onclick="getAll()">Загрузить все книги</button>
+      <div id="res-get-all" class="response">— нажмите кнопку —</div>
+    </div>
+
+    <!-- GET ONE -->
+    <div class="card">
+      <h2><span class="badge get">GET</span> Книга по ID</h2>
+      <input id="get-id" type="number" placeholder="ID книги" min="1" />
+      <button class="btn-get" onclick="getOne()">Найти</button>
+      <div id="res-get-one" class="response">—</div>
+    </div>
+
+    <!-- POST -->
+    <div class="card">
+      <h2><span class="badge post">POST</span> Добавить книгу</h2>
+      <input id="post-title"  type="text" placeholder="Название" />
+      <input id="post-author" type="text" placeholder="Автор" />
+      <input id="post-year"   type="number" placeholder="Год" />
+      <button class="btn-post" onclick="createBook()">Создать</button>
+      <div id="res-post" class="response">—</div>
+    </div>
+
+    <!-- PUT -->
+    <div class="card">
+      <h2><span class="badge put">PUT</span> Обновить книгу</h2>
+      <input id="put-id"     type="number" placeholder="ID книги" min="1" />
+      <input id="put-title"  type="text" placeholder="Новое название" />
+      <input id="put-author" type="text" placeholder="Новый автор" />
+      <input id="put-year"   type="number" placeholder="Год" />
+      <button class="btn-put" onclick="updateBook()">Обновить</button>
+      <div id="res-put" class="response">—</div>
+    </div>
+
+    <!-- DELETE -->
+    <div class="card">
+      <h2><span class="badge delete">DELETE</span> Удалить книгу</h2>
+      <input id="del-id" type="number" placeholder="ID книги" min="1" />
+      <button class="btn-delete" onclick="deleteBook()">Удалить</button>
+      <div id="res-delete" class="response">—</div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card full-width">
+      <h2>📋 Текущий список книг</h2>
+      <button class="btn-get" style="margin-bottom:14px" onclick="refreshTable()">Обновить таблицу</button>
+      <table class="books-table">
+        <thead>
+          <tr><th>ID</th><th>Название</th><th>Автор</th><th>Год</th></tr>
+        </thead>
+        <tbody id="books-tbody">
+          <tr><td colspan="4" style="color:#64748b">Нажмите «Обновить таблицу»</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script type="module">
+    const API = '/api/books';
+
+    function display(id, data, isErr = false) {
+      const el = document.getElementById(id);
+      el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      el.className = 'response' + (isErr ? ' error' : '');
+    }
+
+    async function request(url, method = 'GET', body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(url, opts);
+      const json = await res.json();
+      return { ok: res.ok, status: res.status, json };
+    }
+
+    async function getAll() {
+      const { ok, json } = await request(API);
+      display('res-get-all', json, !ok);
+    }
+
+    async function getOne() {
+      const id = document.getElementById('get-id').value;
+      if (!id) return display('res-get-one', 'Введите ID', true);
+      const { ok, json } = await request(`${API}/${id}`);
+      display('res-get-one', json, !ok);
+    }
+
+    async function createBook() {
+      const title  = document.getElementById('post-title').value.trim();
+      const author = document.getElementById('post-author').value.trim();
+      const year   = Number.parseInt(document.getElementById('post-year').value, 10) || 0;
+      if (!title || !author) return display('res-post', 'Заполните название и автора', true);
+      const { ok, json } = await request(API, 'POST', { title, author, year });
+      display('res-post', json, !ok);
+      if (ok) refreshTable();
+    }
+
+    async function updateBook() {
+      const id     = document.getElementById('put-id').value;
+      const title  = document.getElementById('put-title').value.trim();
+      const author = document.getElementById('put-author').value.trim();
+      const year   = Number.parseInt(document.getElementById('put-year').value, 10) || 0;
+      if (!id) return display('res-put', 'Введите ID', true);
+      if (!title || !author) return display('res-put', 'Заполните название и автора', true);
+      const { ok, json } = await request(`${API}/${id}`, 'PUT', { title, author, year });
+      display('res-put', json, !ok);
+      if (ok) refreshTable();
+    }
+
+    async function deleteBook() {
+      const id = document.getElementById('del-id').value;
+      if (!id) return display('res-delete', 'Введите ID', true);
+      const { ok, json } = await request(`${API}/${id}`, 'DELETE');
+      display('res-delete', json, !ok);
+      if (ok) refreshTable();
+    }
+
+    async function refreshTable() {
+      const { ok, json } = await request(API);
+      const tbody = document.getElementById('books-tbody');
+      if (!ok || !Array.isArray(json) || json.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#64748b">Книг нет</td></tr>';
+        return;
+      }
+      // Сортируем по ID для стабильного отображения
+      json.sort((a, b) => a.id - b.id);
+      tbody.innerHTML = json.map(b =>
+        `<tr>
+          <td>${b.id}</td>
+          <td>${b.title}</td>
+          <td>${b.author}</td>
+          <td>${b.year || '—'}</td>
+        </tr>`
+      ).join('');
+    }
+
+    // Экспортируем функции в глобальную область для onclick-атрибутов
+    Object.assign(globalThis, { getAll, getOne, createBook, updateBook, deleteBook, refreshTable });
+
+    // Загружаем таблицу при старте
+    await refreshTable();
+  </script>
+</body>
+</html>
