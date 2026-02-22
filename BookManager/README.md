@@ -34,8 +34,8 @@ thirdproject/
 ## Запуск
 
 ```bash
-git clone <url>
-cd thirdproject
+git clone https://github.com/rxritet/GoLang-Education/tree/main/BookManager
+cd BookManager
 go run .
 ```
 
