@@ -183,7 +183,7 @@ cd 10-ws-chat && go run .
 
 ## 📈 Прогресс
 
-![Projects](https://img.shields.io/badge/Completed-1%2F10-blue?style=flat-square)
+![Projects](https://img.shields.io/badge/Completed-2%2F10-blue?style=flat-square)
 ![Language](https://img.shields.io/badge/Language-Go-00ADD8?style=flat-square&logo=go)
 
 ---
