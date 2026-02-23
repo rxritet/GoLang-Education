@@ -9,7 +9,7 @@
 | # | Проект | Концепции | Статус |
 |---|--------|-----------|--------|
 | 01 | [Books REST API](#01---books-rest-api) | `net/http`, CRUD, in-memory store, CORS | ✅ Готово |
-| 02 | [CLI Todo Manager](#02---cli-todo-manager) | `flag`, файловый I/O, JSON-персистентность | 🔄 В процессе |
+| 02 | [CLI Todo Manager](#02---cli-todo-manager) | `flag`, файловый I/O, JSON-персистентность | ✅ Готово |
 | 03 | [Weather CLI](#03---weather-cli) | HTTP client, внешние API, вложенный JSON | ⏳ Планируется |
 | 04 | [Password Generator](#04---password-generator) | `crypto/rand`, `strings.Builder`, unit-тесты | ⏳ Планируется |
 | 05 | [Web Scraper](#05---web-scraper) | горутины, каналы, `sync.WaitGroup` | ⏳ Планируется |
