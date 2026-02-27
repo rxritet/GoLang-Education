@@ -1,0 +1,8 @@
+# Пример файла с URL (одна ссылка на строку).
+# Строки, начинающиеся с #, игнорируются.
+
+https://go.dev
+https://github.com
+https://en.wikipedia.org
+https://www.rust-lang.org
+https://news.ycombinator.com
