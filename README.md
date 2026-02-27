@@ -1,6 +1,8 @@
 # 🐹 Go Learning Path — 10 Projects
 
-> Мой путь изучения Go через практику. Каждый проект добавляет новые концепции языка поверх предыдущего — от базового REST API до WebSocket-чата в реальном времени.
+> Мой путь изучения Go через практику. Каждый проект добавляет новые концепции языка поверх предыдущего — от базового REST API до worker pool и системного мониторинга.
+>
+> Полученные здесь навыки применены в production-проектах — **[Specto](https://github.com/rxritet/Specto)** и **[HabitDuel](https://github.com/rxritet/HabitDuel)**.
 
 ---
 
@@ -8,22 +10,35 @@
 
 | # | Проект | Концепции | Статус |
 |---|--------|-----------|--------|
-| 01 | [Books REST API](#01---books-rest-api) | `net/http`, CRUD, in-memory store, CORS | ✅ Готово |
-| 02 | [CLI Todo Manager](#02---cli-todo-manager) | `flag`, файловый I/O, JSON-персистентность | ✅ Готово |
-| 03 | [Weather CLI](#03---weather-cli) | HTTP client, внешние API, вложенный JSON | ✅ Готово |
-| 04 | [Password Generator](#04---password-generator) | `crypto/rand`, `strings.Builder`, unit-тесты | ⏳ Планируется |
-| 05 | [Web Scraper](#05---web-scraper) | горутины, каналы, `sync.WaitGroup` | ⏳ Планируется |
-| 06 | [Job Queue / Task Runner](#06---job-queue--task-runner) | worker pool, буф. каналы, `context` | ⏳ Планируется |
-| 07 | [System Monitor API](#07---system-monitor-api) | `time.Ticker`, горутины в фоне, `runtime` | ⏳ Планируется |
-| 08 | [Books API v2 + PostgreSQL](#08---books-api-v2--postgresql) | `database/sql`, `pgx`, SQL-миграции | ⏳ Планируется |
-| 09 | [URL Shortener + JWT Auth](#09---url-shortener--jwt-auth) | middleware, JWT, `bcrypt` | ⏳ Планируется |
-| 10 | [WebSocket Chat](#10---websocket-chat) | `gorilla/websocket`, broadcast, real-time | ⏳ Планируется |
+| 01 | [BookManager](#01--bookmanager--rest-api) | `net/http`, CRUD, handlers/models, in-memory + `sync.RWMutex`, CORS | ✅ Готово |
+| 02 | [TodoApp](#02--todoapp--cli-repl) | `bufio.Scanner`, REPL-лоп, JSON-персистентность, файловый I/O | ✅ Готово |
+| 03 | [WeatherApp](#03--weatherapp--external-api) | HTTP client, внешние API, Makefile, `cmd/internal` структура | ✅ Готово |
+| 04 | [PasswordGenerator](#04--passwordgenerator--crypto) | `crypto/rand`, `strings.Builder`, unit-тесты | ✅ Готово |
+| 05 | [WebScraper](#05--webscraper--goroutines) | горутины, каналы, `sync.WaitGroup`, HTML-парсинг | ✅ Готово |
+| 06 | [JobQueue](#06--jobqueue--worker-pool) | worker pool, буф. каналы, `context` с таймаутом | ✅ Готово |
+| 07 | [SystemMonitor](#07--systemmonitor--ticker--metrics) | `time.Ticker`, фоновые горутины, `sync.Mutex`, `runtime` | ✅ Готово |
+| 08 | [Books API v2 + PostgreSQL](#08--books-api-v2--postgresql) | `database/sql`, `pgx`, SQL-миграции, транзакции | ⏳ Планируется |
+| 09 | [URL Shortener + JWT](#09--url-shortener--jwt-auth) | middleware, JWT, `bcrypt`, цепочки | ⏳ Планируется |
+| 10 | [WebSocket Chat](#10--websocket-chat) | `gorilla/websocket`, broadcast, real-time состояние | ⏳ Планируется |
 
 ---
 
-## 01 — Books REST API
+## 💪 Применено в production
+
+Навыки из этих проектов напрямую использованы в настоящих проектах:
+
+| Проект | Что применено |
+|--------|-------------------|
+| **[Specto](https://github.com/rxritet/Specto)** | чистый `net/http` (как BookManager), двойная стратегия БД BoltDB/PostgreSQL (как Books v2), tx-in-context, Cobra CLI, Mage, OpenTelemetry |
+| **[HabitDuel](https://github.com/rxritet/HabitDuel)** | WebSocket real-time связь с WebSocket Chat, JWT-аутентификация (как URL Shortener), cron и фоновые горутины (как SystemMonitor) |
+
+---
+
+## 01 — BookManager — REST API
 
 **Первый проект.** Полноценный REST API для управления коллекцией книг без внешних зависимостей.
+
+**Структура:** `handlers/` — HTTP-обработчики, `models/` — доменные структуры, `static/` — веб-интерфейс.
 
 - Полный CRUD через `net/http`
 - Потокобезопасное in-memory хранилище (`sync.RWMutex`)
@@ -31,146 +46,166 @@
 - CORS для локальной разработки
 
 ```bash
-cd 01-books-api && go run .
+cd BookManager && go run .
 # http://localhost:8080
 ```
 
 ---
 
-## 02 — CLI Todo Manager
+## 02 — TodoApp — CLI REPL
 
-Менеджер задач в терминале. Задачи сохраняются в JSON-файл и живут между перезапусками.
+Менеджер задач с REPL-интерфейсом. Задачи сохраняются в JSON-файл и живут между перезапусками.
 
-- Парсинг флагов через `flag`
-- Чтение/запись файлов (`os`, `encoding/json`)
-- Персистентность данных без БД
+**Файлы:** `main.go` — точка входа, `repl.go` — интерактивный цикл, `todo.go` — модель, `storage.go` — персистентность.
+
+- `bufio.Scanner` для чтения stdin
+- `encoding/json` + `os` для персистентности
+- Чистое разделение ответственностей (модель / I/O / UI)
 
 ```bash
-cd 02-todo-cli
-go run . --add "Выучить горутины"
-go run . --list
-go run . --done 1
+cd TodoApp && go run .
+# add <текст> | list | done <id> | delete <id> | quit
 ```
 
 ---
 
-## 03 — Weather CLI
+## 03 — WeatherApp — External API
 
-Консольное приложение, которое показывает погоду для любого города через OpenWeatherMap API.
+Консольное приложение для получения погоды через OpenWeatherMap API. Структура по `cmd/internal` — стандартная для реальных Go-проектов.
 
-- Работа с внешним HTTP API
+- Внешний HTTP-клиент с таймаутом
 - Парсинг вложенного JSON
-- Обработка ошибок сети
+- Makefile: `make run CITY=Almaty`, `make build`
+- Грамотная обработка ошибок сети
 
 ```bash
-cd 03-weather-cli && go run . --city Almaty
+cd WeatherApp
+make run CITY=Almaty
+# или: go run ./cmd/weather --city Almaty
 ```
 
 ---
 
-## 04 — Password Generator
+## 04 — PasswordGenerator — Crypto
 
-CLI-утилита для генерации криптографически стойких паролей с настройкой параметров.
+CLI-утилита для генерации криптографически стойких паролей. Бизнес-логика вынесена в пакет `generator/`.
 
-- Безопасная генерация: `crypto/rand`
-- Флаги: `--length`, `--symbols`, `--numbers`
+- `crypto/rand` вместо `math/rand` — безопасная генерация
+- `strings.Builder` для эффективной сборки строки
+- Флаги: `--length`, `--symbols`, `--numbers`, `--count`
 - Unit-тесты: `go test ./...`
 
 ```bash
-cd 04-password-gen
-go run . --length 16 --symbols
+cd PasswordGenerator
+go run . --length 16 --symbols --count 3
 go test ./...
 ```
 
 ---
 
-## 05 — Web Scraper
+## 05 — WebScraper — Goroutines
 
-Параллельный скрапер, который принимает список URL и одновременно собирает заголовки страниц.
+Параллельный скрапер: принимает список URL из файла и одновременно собирает заголовки всех страниц.
 
-- Горутины + каналы (`chan`)
+**Структура:** `scraper/` — парсер и клиент, `main.go` — оркестрация, `urls.txt` — входной файл.
+
+- Каждый URL обрабатывается в отдельной горутине
 - `sync.WaitGroup` для синхронизации
-- Парсинг HTML: `golang.org/x/net/html`
+- Результаты собираются через канал (`chan Result`)
+- HTML-парсинг: `golang.org/x/net/html`
 
 ```bash
-cd 05-scraper && go run . --urls urls.txt
+cd WebScraper && go run . --file urls.txt
 ```
 
 ---
 
-## 06 — Job Queue / Task Runner
+## 06 — JobQueue — Worker Pool
 
 HTTP-сервер принимает задачи и выполняет их в фоне через пул воркеров.
 
-- Worker pool pattern
-- Буферизованные каналы
-- `context` с таймаутом и отменой
+**Структура:** `handler/` — HTTP, `worker/` — пул воркеров, `store/` — хранилище задач.
+
+- Worker pool pattern: N воркеров, буферизованный канал задач
+- `context.WithTimeout` для отмены зависших задач
+- Статусы: `pending` → `running` → `done/failed`
+- REST эндпоинты: `POST /jobs`, `GET /jobs`, `GET /jobs/:id`
 
 ```bash
-cd 06-job-queue && go run .
-curl -X POST http://localhost:8080/jobs -d '{"task":"send_email"}'
+cd JobQueue && go run .
+curl -X POST http://localhost:8080/jobs -d '{"type":"email","payload":"test"}'
+curl http://localhost:8080/jobs
 ```
 
 ---
 
-## 07 — System Monitor API
+## 07 — SystemMonitor — Ticker & Metrics
 
-Эндпоинт, который каждые N секунд собирает метрики CPU и RAM и отдаёт их в JSON.
+Мониторинг системных ресурсов: каждые N секунд собираются метрики и отдаются в JSON.
 
-- `time.Ticker` для периодических задач
-- Фоновые горутины + `sync.Mutex`
-- Пакет `runtime` для метрик
+**Структура:** `collector/` — сбор метрик, `handler/` — HTTP-отдача.
+
+- `time.Ticker` в фоновой горутине
+- `sync.Mutex` для безопасного доступа к последнему снепшоту
+- Пакет `runtime`: память, горутины, GC-циклы
+- История снепшотов: `GET /metrics/history`
 
 ```bash
-cd 07-sysmonitor && go run .
+cd SystemMonitor && go run .
 curl http://localhost:8080/metrics
+curl http://localhost:8080/metrics/history
 ```
 
 ---
 
 ## 08 — Books API v2 + PostgreSQL
 
-Рефакторинг первого проекта: замена in-memory store на PostgreSQL.
+Рефакторинг BookManager: замена in-memory store на PostgreSQL.
 
 - `database/sql` + `pgx` драйвер
 - SQL-миграции
 - Транзакции и пул соединений
 
 ```bash
-cd 08-books-postgres
-docker-compose up -d
-go run .
+# cd BooksPostgres
+# docker-compose up -d && go run .
 ```
+
+> ⏳ В плане. На практике эта концепция уже проработана в [Specto](https://github.com/rxritet/Specto) (двойная стратегия BoltDB/PostgreSQL с единым интерфейсом репозитория).
 
 ---
 
 ## 09 — URL Shortener + JWT Auth
 
-Сервис коротких ссылок с регистрацией, логином и защитой эндпоинтов через JWT.
+Сервис коротких ссылок с регистрацией и защитой эндпоинтов через JWT.
 
 - Middleware-цепочки
 - JWT: `golang-jwt/jwt`
 - Хэширование паролей: `bcrypt`
 
 ```bash
-cd 09-url-shortener && go run .
-# POST /register, POST /login, POST /shorten
+# cd URLShortener
+# go run . → POST /register, POST /login, POST /shorten
 ```
+
+> ⏳ В плане. JWT-аутентификация уже применена в [HabitDuel](https://github.com/rxritet/HabitDuel) (Dart Shelf сервер, middleware-слой).
 
 ---
 
 ## 10 — WebSocket Chat
 
-Чат в реальном времени: сервер получает сообщения от одного клиента и рассылает всем остальным.
+Чат в реальном времени: сервер получает сообщения и рассылает всем подключённым.
 
 - `gorilla/websocket`
 - Broadcast через каналы
 - Управление состоянием подключённых клиентов
 
 ```bash
-cd 10-ws-chat && go run .
+# cd WSChat && go run .
 # http://localhost:8080
 ```
+
+> ⏳ В плане. WebSocket уже реализован в [HabitDuel](https://github.com/rxritet/HabitDuel) (хаб реального времени дуэлей на Dart Shelf).
 
 ---
 
@@ -183,8 +218,9 @@ cd 10-ws-chat && go run .
 
 ## 📈 Прогресс
 
-![Projects](https://img.shields.io/badge/Completed-2%2F10-blue?style=flat-square)
+![Projects](https://img.shields.io/badge/Выполнено-7%2F10-00ADD8?style=flat-square&logo=go&logoColor=white)
 ![Language](https://img.shields.io/badge/Language-Go-00ADD8?style=flat-square&logo=go)
+![Production](https://img.shields.io/badge/Production—ready-Specto%20%7C%20HabitDuel-success?style=flat-square)
 
 ---
 
