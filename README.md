@@ -30,7 +30,6 @@
 | Проект | Что применено |
 |--------|-------------------|
 | **[Specto](https://github.com/rxritet/Specto)** | чистый `net/http` (как BookManager), двойная стратегия БД BoltDB/PostgreSQL (как Books v2), tx-in-context, Cobra CLI, Mage, OpenTelemetry |
-| **[HabitDuel](https://github.com/rxritet/HabitDuel)** | WebSocket real-time связь с WebSocket Chat, JWT-аутентификация (как URL Shortener), cron и фоновые горутины (как SystemMonitor) |
 
 ---
 
