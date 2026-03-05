@@ -8,18 +8,18 @@
 
 ## 🗺️ Roadmap
 
-| # | Проект | Концепции | Статус |
-|---|--------|-----------|--------|
-| 01 | [BookManager](#01--bookmanager--rest-api) | `net/http`, CRUD, handlers/models, in-memory + `sync.RWMutex`, CORS | ✅ Готово |
-| 02 | [TodoApp](#02--todoapp--cli-repl) | `bufio.Scanner`, REPL-лоп, JSON-персистентность, файловый I/O | ✅ Готово |
-| 03 | [WeatherApp](#03--weatherapp--external-api) | HTTP client, внешние API, Makefile, `cmd/internal` структура | ✅ Готово |
-| 04 | [PasswordGenerator](#04--passwordgenerator--crypto) | `crypto/rand`, `strings.Builder`, unit-тесты | ✅ Готово |
-| 05 | [WebScraper](#05--webscraper--goroutines) | горутины, каналы, `sync.WaitGroup`, HTML-парсинг | ✅ Готово |
-| 06 | [JobQueue](#06--jobqueue--worker-pool) | worker pool, буф. каналы, `context` с таймаутом | ✅ Готово |
-| 07 | [SystemMonitor](#07--systemmonitor--ticker--metrics) | `time.Ticker`, фоновые горутины, `sync.Mutex`, `runtime` | ✅ Готово |
-| 08 | [Books API v2 + PostgreSQL](#08--books-api-v2--postgresql) | `database/sql`, `pgx`, SQL-миграции, транзакции | ⏳ Планируется |
-| 09 | [URL Shortener + JWT](#09--url-shortener--jwt-auth) | middleware, JWT, `bcrypt`, цепочки | ⏳ Планируется |
-| 10 | [WebSocket Chat](#10--websocket-chat) | `gorilla/websocket`, broadcast, real-time состояние | ⏳ Планируется |
+| #   | Проект                                                     | Концепции                                                           | Статус         |
+| --- | ---------------------------------------------------------- | ------------------------------------------------------------------- | -------------- |
+| 01  | [BookManager](#01--bookmanager--rest-api)                  | `net/http`, CRUD, handlers/models, in-memory + `sync.RWMutex`, CORS | ✅ Готово      |
+| 02  | [TodoApp](#02--todoapp--cli-repl)                          | `bufio.Scanner`, REPL-лоп, JSON-персистентность, файловый I/O       | ✅ Готово      |
+| 03  | [WeatherApp](#03--weatherapp--external-api)                | HTTP client, внешние API, Makefile, `cmd/internal` структура        | ✅ Готово      |
+| 04  | [PasswordGenerator](#04--passwordgenerator--crypto)        | `crypto/rand`, `strings.Builder`, unit-тесты                        | ✅ Готово      |
+| 05  | [WebScraper](#05--webscraper--goroutines)                  | горутины, каналы, `sync.WaitGroup`, HTML-парсинг                    | ✅ Готово      |
+| 06  | [JobQueue](#06--jobqueue--worker-pool)                     | worker pool, буф. каналы, `context` с таймаутом                     | ✅ Готово      |
+| 07  | [SystemMonitor](#07--systemmonitor--ticker--metrics)       | `time.Ticker`, фоновые горутины, `sync.Mutex`, `runtime`            | ✅ Готово      |
+| 08  | [Books API v2 + PostgreSQL](#08--books-api-v2--postgresql) | `database/sql`, `pgx`, SQL-миграции, транзакции                     | ⏳ Планируется |
+| 09  | [URL Shortener + JWT](#09--url-shortener--jwt-auth)        | middleware, JWT, `bcrypt`, цепочки                                  | ⏳ Планируется |
+| 10  | [WebSocket Chat](#10--websocket-chat)                      | `gorilla/websocket`, broadcast, real-time состояние                 | ⏳ Планируется |
 
 ---
 
@@ -27,8 +27,8 @@
 
 Навыки из этих проектов напрямую использованы в настоящих проектах:
 
-| Проект | Что применено |
-|--------|-------------------|
+| Проект                                          | Что применено                                                                                                                             |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | **[Specto](https://github.com/rxritet/Specto)** | чистый `net/http` (как BookManager), двойная стратегия БД BoltDB/PostgreSQL (как Books v2), tx-in-context, Cobra CLI, Mage, OpenTelemetry |
 
 ---
@@ -223,4 +223,4 @@ curl http://localhost:8080/metrics/history
 
 ---
 
-*Обновляется по мере прохождения каждого проекта.*
+_Обновляется по мере прохождения каждого проекта._

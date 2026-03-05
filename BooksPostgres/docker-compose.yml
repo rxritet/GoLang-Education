@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bookspostgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: books
+      POSTGRES_PASSWORD: books
+      POSTGRES_DB: booksdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+
+volumes:
+  pg_data:
