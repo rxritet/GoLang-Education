@@ -8,18 +8,18 @@
 
 ## 🗺️ Roadmap
 
-| #   | Проект                                                     | Концепции                                                           | Статус         |
-| --- | ---------------------------------------------------------- | ------------------------------------------------------------------- | -------------- |
-| 01  | [BookManager](#01--bookmanager--rest-api)                  | `net/http`, CRUD, handlers/models, in-memory + `sync.RWMutex`, CORS | ✅ Готово      |
-| 02  | [TodoApp](#02--todoapp--cli-repl)                          | `bufio.Scanner`, REPL-лоп, JSON-персистентность, файловый I/O       | ✅ Готово      |
-| 03  | [WeatherApp](#03--weatherapp--external-api)                | HTTP client, внешние API, Makefile, `cmd/internal` структура        | ✅ Готово      |
-| 04  | [PasswordGenerator](#04--passwordgenerator--crypto)        | `crypto/rand`, `strings.Builder`, unit-тесты                        | ✅ Готово      |
-| 05  | [WebScraper](#05--webscraper--goroutines)                  | горутины, каналы, `sync.WaitGroup`, HTML-парсинг                    | ✅ Готово      |
-| 06  | [JobQueue](#06--jobqueue--worker-pool)                     | worker pool, буф. каналы, `context` с таймаутом                     | ✅ Готово      |
-| 07  | [SystemMonitor](#07--systemmonitor--ticker--metrics)       | `time.Ticker`, фоновые горутины, `sync.Mutex`, `runtime`            | ✅ Готово      |
-| 08  | [Books API v2 + PostgreSQL](#08--books-api-v2--postgresql) | `database/sql`, `pgx`, SQL-миграции, транзакции                     | ⏳ Планируется |
-| 09  | [URL Shortener + JWT](#09--url-shortener--jwt-auth)        | middleware, JWT, `bcrypt`, цепочки                                  | ⏳ Планируется |
-| 10  | [WebSocket Chat](#10--websocket-chat)                      | `gorilla/websocket`, broadcast, real-time состояние                 | ⏳ Планируется |
+| #   | Проект                                                     | Концепции                                                           | Статус    |
+| --- | ---------------------------------------------------------- | ------------------------------------------------------------------- | --------- |
+| 01  | [BookManager](#01--bookmanager--rest-api)                  | `net/http`, CRUD, handlers/models, in-memory + `sync.RWMutex`, CORS | ✅ Готово |
+| 02  | [TodoApp](#02--todoapp--cli-repl)                          | `bufio.Scanner`, REPL-лоп, JSON-персистентность, файловый I/O       | ✅ Готово |
+| 03  | [WeatherApp](#03--weatherapp--external-api)                | HTTP client, внешние API, Makefile, `cmd/internal` структура        | ✅ Готово |
+| 04  | [PasswordGenerator](#04--passwordgenerator--crypto)        | `crypto/rand`, `strings.Builder`, unit-тесты                        | ✅ Готово |
+| 05  | [WebScraper](#05--webscraper--goroutines)                  | горутины, каналы, `sync.WaitGroup`, HTML-парсинг                    | ✅ Готово |
+| 06  | [JobQueue](#06--jobqueue--worker-pool)                     | worker pool, буф. каналы, `context` с таймаутом                     | ✅ Готово |
+| 07  | [SystemMonitor](#07--systemmonitor--ticker--metrics)       | `time.Ticker`, фоновые горутины, `sync.Mutex`, `runtime`            | ✅ Готово |
+| 08  | [Books API v2 + PostgreSQL](#08--books-api-v2--postgresql) | `database/sql`, `pgx`, SQL-миграции, транзакции                     | ✅ Готово |
+| 09  | [URL Shortener + JWT](#09--url-shortener--jwt-auth)        | middleware, JWT, `bcrypt`, цепочки                                  | ✅ Готово |
+| 10  | [WebSocket Chat](#10--websocket-chat)                      | `gorilla/websocket`, broadcast, real-time состояние                 | ✅ Готово |
 
 ---
 
@@ -166,11 +166,13 @@ curl http://localhost:8080/metrics/history
 - Транзакции и пул соединений
 
 ```bash
-# cd BooksPostgres
-# docker-compose up -d && go run .
+cd BooksPostgres
+docker-compose up -d
+go run .
+# http://localhost:8080
 ```
 
-> ⏳ В плане. На практике эта концепция уже проработана в [Specto](https://github.com/rxritet/Specto) (двойная стратегия BoltDB/PostgreSQL с единым интерфейсом репозитория).
+> ✅ **Реализовано**. На практике эта концепция также проработана в [Specto](https://github.com/rxritet/Specto) (двойная стратегия BoltDB/PostgreSQL с единым интерфейсом репозитория).
 
 ---
 
@@ -183,11 +185,12 @@ curl http://localhost:8080/metrics/history
 - Хэширование паролей: `bcrypt`
 
 ```bash
-# cd URLShortener
-# go run . → POST /register, POST /login, POST /shorten
+cd URLShortener
+go run .
+# http://localhost:8080 → POST /register, POST /login, POST /shorten
 ```
 
-> ⏳ В плане. JWT-аутентификация уже применена в [HabitDuel](https://github.com/rxritet/HabitDuel) (Dart Shelf сервер, middleware-слой).
+> ✅ **Реализовано**. JWT-аутентификация также применена в [HabitDuel](https://github.com/rxritet/HabitDuel) (Dart Shelf сервер, middleware-слой).
 
 ---
 
@@ -200,11 +203,11 @@ curl http://localhost:8080/metrics/history
 - Управление состоянием подключённых клиентов
 
 ```bash
-# cd WSChat && go run .
+cd WSChat && go run .
 # http://localhost:8080
 ```
 
-> ⏳ В плане. WebSocket уже реализован в [HabitDuel](https://github.com/rxritet/HabitDuel) (хаб реального времени дуэлей на Dart Shelf).
+> ✅ **Реализовано**. WebSocket также реализован в [HabitDuel](https://github.com/rxritet/HabitDuel) (хаб реального времени дуэлей на Dart Shelf).
 
 ---
 
@@ -217,7 +220,7 @@ curl http://localhost:8080/metrics/history
 
 ## 📈 Прогресс
 
-![Projects](https://img.shields.io/badge/Выполнено-7%2F10-00ADD8?style=flat-square&logo=go&logoColor=white)
+![Projects](https://img.shields.io/badge/Выполнено-10%2F10-22c55e?style=flat-square&logo=go&logoColor=white)
 ![Language](https://img.shields.io/badge/Language-Go-00ADD8?style=flat-square&logo=go)
 ![Production](https://img.shields.io/badge/Production—ready-Specto%20%7C%20HabitDuel-success?style=flat-square)
 
