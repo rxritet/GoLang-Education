@@ -35,6 +35,14 @@ type errResponse struct {
 	Error string `json:"error"`
 }
 
+// Error messages
+const (
+	errIDRequired   = "id required"
+	errInvalidJSON  = "invalid JSON"
+	errBookNotFound = "book not found"
+	booksPrefix     = "/books/"
+)
+
 // ---------- Handler ----------
 
 // Handler содержит репозиторий и реализует HTTP-обработчики.
@@ -77,7 +85,7 @@ func (h *Handler) ListBooks(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	var req createRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSON(w, http.StatusBadRequest, errResponse{Error: "invalid JSON"})
+		writeJSON(w, http.StatusBadRequest, errResponse{Error: errInvalidJSON})
 		return
 	}
 	if strings.TrimSpace(req.Title) == "" || strings.TrimSpace(req.Author) == "" || req.Year == 0 {
@@ -98,9 +106,9 @@ func (h *Handler) CreateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetBook(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/books/")
+	id := strings.TrimPrefix(r.URL.Path, booksPrefix)
 	if id == "" {
-		writeJSON(w, http.StatusBadRequest, errResponse{Error: "id required"})
+		writeJSON(w, http.StatusBadRequest, errResponse{Error: errIDRequired})
 		return
 	}
 
@@ -109,22 +117,22 @@ func (h *Handler) GetBook(w http.ResponseWriter, r *http.Request) {
 
 	book, err := h.repo.GetByID(ctx, id)
 	if err != nil {
-		writeJSON(w, http.StatusNotFound, errResponse{Error: "book not found"})
+		writeJSON(w, http.StatusNotFound, errResponse{Error: errBookNotFound})
 		return
 	}
 	writeJSON(w, http.StatusOK, book)
 }
 
 func (h *Handler) UpdateBook(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/books/")
+	id := strings.TrimPrefix(r.URL.Path, booksPrefix)
 	if id == "" {
-		writeJSON(w, http.StatusBadRequest, errResponse{Error: "id required"})
+		writeJSON(w, http.StatusBadRequest, errResponse{Error: errIDRequired})
 		return
 	}
 
 	var req createRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSON(w, http.StatusBadRequest, errResponse{Error: "invalid JSON"})
+		writeJSON(w, http.StatusBadRequest, errResponse{Error: errInvalidJSON})
 		return
 	}
 
@@ -133,16 +141,16 @@ func (h *Handler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 	book := &models.Book{ID: id, Title: req.Title, Author: req.Author, Year: req.Year}
 	if err := h.repo.Update(ctx, book); err != nil {
-		writeJSON(w, http.StatusNotFound, errResponse{Error: "book not found"})
+		writeJSON(w, http.StatusNotFound, errResponse{Error: errBookNotFound})
 		return
 	}
 	writeJSON(w, http.StatusOK, book)
 }
 
 func (h *Handler) DeleteBook(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/books/")
+	id := strings.TrimPrefix(r.URL.Path, booksPrefix)
 	if id == "" {
-		writeJSON(w, http.StatusBadRequest, errResponse{Error: "id required"})
+		writeJSON(w, http.StatusBadRequest, errResponse{Error: errIDRequired})
 		return
 	}
 
@@ -150,7 +158,7 @@ func (h *Handler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	if err := h.repo.Delete(ctx, id); err != nil {
-		writeJSON(w, http.StatusNotFound, errResponse{Error: "book not found"})
+		writeJSON(w, http.StatusNotFound, errResponse{Error: errBookNotFound})
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
